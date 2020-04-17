@@ -1,5 +1,6 @@
 import consola, { Consola } from 'consola'
 import EventEmitter from 'eventemitter3'
+import { ParamError } from '../error'
 
 import {
   IDriver,
@@ -9,7 +10,7 @@ import {
   IRequestTask,
   IResponseTask
 } from '../interface'
-import { isMessage, isNotifyMessage, isRequestMessage, isResponseMessage } from '../helper'
+import { isMessage, isNotifyMessage, isRequestMessage, isResponseMessage, isValidUrl, isWindow } from '../helper'
 
 export class IFrameDriver extends EventEmitter implements IDriver {
   protected _defaultChannel: string
@@ -43,6 +44,14 @@ export class IFrameDriver extends EventEmitter implements IDriver {
   ) {
     super()
 
+    if (!isWindow(win)) {
+      throw ParamError.fromCode(100, 'win')
+    }
+
+    if (!isValidUrl(targetOrigin)) {
+      throw ParamError.fromCode(101, 'targetOrigin')
+    }
+
     this._win = win
     this._defaultChannel = defaultChannel
     this._targetOrigin = this._cleanOrigin(targetOrigin)
@@ -71,7 +80,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
     }
 
     this._log.info(`Notify ${this._targetOrigin}.`)
-    this._log.debug(`Notify content.`, message)
+    this._log.debug(`Notify content:`, message)
     this._win.postMessage(message, this._targetOrigin)
   }
 
@@ -99,6 +108,8 @@ export class IFrameDriver extends EventEmitter implements IDriver {
       })
     })
 
+    this._log.info(`Request ${this._targetOrigin}.`)
+    this._log.debug(`Request content:`, message)
     this._win.postMessage(message, this._targetOrigin)
     return promise
   }
@@ -128,8 +139,8 @@ export class IFrameDriver extends EventEmitter implements IDriver {
       throw new Error(`Response must contain result or error, but both is nil.`)
     }
 
-    this._log.info(`Response to ${this._targetOrigin}.`)
-    this._log.debug(`Response content.`, message)
+    this._log.info(`Response ${this._targetOrigin}.`)
+    this._log.debug(`Response content:`, message)
     task.source.postMessage(message, this._targetOrigin)
     this._needToResponse.delete(key)
   }

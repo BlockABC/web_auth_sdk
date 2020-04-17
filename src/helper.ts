@@ -27,3 +27,17 @@ export function isError (val: any): val is IError {
 export function isMessage (val: any): boolean {
   return isNotifyMessage(val) || isRequestMessage(val) || isResponseMessage(val)
 }
+
+export function isWindow (val: any): boolean {
+  return val && val.hasOwnProperty('postMessage')
+}
+
+export function isValidUrl (val: any): boolean {
+  try {
+    new URL(val)
+    return true
+  }
+  catch {
+    return false
+  }
+}

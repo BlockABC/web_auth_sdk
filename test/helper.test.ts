@@ -1,3 +1,4 @@
+import { isValidUrl, isWindow } from '../src/helper'
 import * as helper from '../src/helper'
 
 describe('helper', () => {
@@ -170,6 +171,28 @@ describe('helper', () => {
         message: '',
       }
       expect(helper.isMessage(error)).toBeFalsy()
+    })
+  })
+
+  describe('isWindow', () => {
+    test('should return true if it has portMessage', () => {
+      expect(isWindow(window)).toBeTruthy()
+    })
+
+    test('should return false if it has not portMessage', () => {
+      expect(isWindow({})).toBeFalsy()
+    })
+  })
+
+  describe('isValidUrl', () => {
+    test('should return true if url is valid', () => {
+      const url = 'http://127.0.0.1:3000'
+      expect(isValidUrl(url)).toBeTruthy()
+    })
+
+    test('should return false if url is valid', () => {
+      const url = ''
+      expect(isValidUrl(url)).toBeFalsy()
     })
   })
 })
