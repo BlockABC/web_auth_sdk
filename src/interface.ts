@@ -1,20 +1,58 @@
 export interface IDriver {
-  request (params: { channel?: string, method: string, params?: any }): void
-  response (params: { channel?: string, id: string, result?: any, error?: any }): void
-  notify (params: { channel?: string, method: string, params?: any }): void
+  timeout: number,
+
+  /**
+   * Send a notify message to target window
+   *
+   * @param {string} [channel]
+   * @param {string} method
+   * @param {any} [params]
+   */
+  notify (
+    { channel, method, params }:
+    { channel?: string, method: string, params?: any }
+  ): void,
+
+  /**
+   * Send a request message to target window
+   *
+   * Return a promise which will be resolve or reject if target window send response.
+   *
+   * @param {string} [channel]
+   * @param {string} method
+   * @param {any} [params]
+   * @return {Promise<T>}
+   */
+  request<T> (
+    { channel, method, params }:
+    { channel?: string, method: string, params?: any }
+  ): Promise<T>,
+
+  /**
+   * Send a response message to target window
+   *
+   * @param {string} [channel]
+   * @param {string} id
+   * @param {any} [result]
+   * @param {any} [error]
+   */
+  response (
+    { channel, id, result, error }:
+    { channel?: string, id: string, result?: any, error?: any }
+  ): void,
 }
 
 export interface IResponseTask {
   createdAt: Date,
-  source: Window,
   message: IRequestMessage,
+  source: Window,
 }
 
 export interface IRequestTask {
   createdAt: Date,
-  resolve: Function,
-  reject: Function,
   message: IRequestMessage,
+  reject: Function,
+  resolve: Function,
 }
 
 export interface IRequestMessage {
@@ -32,13 +70,13 @@ export interface INotifyMessage {
 
 export interface IResponseMessage {
   channel: string,
+  error?: IError
   id: string,
   result?: any,
-  error?: IError
 }
 
 export interface IError {
   code: number,
-  message: string,
   data: any | null
+  message: string,
 }
