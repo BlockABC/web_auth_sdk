@@ -1,7 +1,7 @@
 import consola from 'consola'
 
-import { IFrameDriver } from '../../src/driver'
-import { INotifyMessage, IRequestMessage } from '../../src/interface'
+import { IFrameDriver } from '~/driver'
+import { INotifyMessage, IRequestMessage } from '~/interface'
 import { currentOrigin, targetOrigin } from '../const'
 
 consola.clear()
@@ -204,7 +204,7 @@ describe('IframeDriver', () => {
       const error = {
         code: 1,
         message: '',
-        data: null,
+        data: null as any,
       }
       const message = {
         channel: 'default',

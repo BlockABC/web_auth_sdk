@@ -1,5 +1,17 @@
 import { IError, INotifyMessage, IRequestMessage, IResponseMessage } from './interface'
 
+export function isNumber (val: any): val is number {
+  return typeof val === 'number'
+}
+
+export function isString (val: any): val is string {
+  return typeof val === 'string'
+}
+
+export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+  return key in obj
+}
+
 export function isRequestMessage (val: any): val is IRequestMessage {
   return !!(val.channel && val.id && val.method && val.hasOwnProperty('params'))
 }

@@ -1,15 +1,8 @@
 import consola, { Consola } from 'consola'
 import EventEmitter from 'eventemitter3'
-import { ParamError } from '../error'
 
-import {
-  IDriver,
-  INotifyMessage,
-  IRequestMessage,
-  IResponseMessage,
-  IRequestTask,
-  IResponseTask
-} from '../interface'
+import { IDriver, INotifyMessage, IRequestMessage, IResponseMessage, IRequestTask, IResponseTask } from '../interface'
+import { ParamError } from '../error'
 import { isMessage, isNotifyMessage, isRequestMessage, isResponseMessage, isValidUrl, isWindow } from '../helper'
 
 export class IFrameDriver extends EventEmitter implements IDriver {
@@ -68,7 +61,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
   }
 
   notify (
-    { channel = null, method, params = null }:
+    { channel, method, params = null }:
     { channel?: string, method: string, params?: any }
   ) {
     channel = channel ?? this._defaultChannel
@@ -85,7 +78,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
   }
 
   request<T>(
-    { channel = null, method, params = null }:
+    { channel, method, params = null }:
     { channel?: string; method: string; params?: any }
   ): Promise<T> {
     channel = channel ?? this._defaultChannel
@@ -115,7 +108,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
   }
 
   response (
-    { channel = null, id, result = null, error = null }:
+    { channel, id, result = null, error = null }:
     { channel?: string, id: string, result?: any, error?: any }
   ): void {
     channel = channel ?? this._defaultChannel
@@ -194,17 +187,17 @@ export class IFrameDriver extends EventEmitter implements IDriver {
 
     // skip message from the same page, skip empty message
     if (process.env.PROD && e.origin === window.location.origin) {
-      this._log.debug(`Skip message because origin is the same.`)
+      this._log.warn(`Skip message because origin is the same.`)
       return
     }
     // skip empty message
     else if (!isMessage(e.data)) {
-      this._log.debug(`Skip message because it is empty.`)
+      this._log.warn(`Skip message because it is empty.`)
       return
     }
     // skip message from invalid page
     else if (this._targetOrigin !== this._cleanOrigin(e.origin)) {
-      this._log.debug(`Skip message because origin is invalid.`)
+      this._log.warn(`Skip message because origin is invalid.`)
       return
     }
 
@@ -227,7 +220,10 @@ export class IFrameDriver extends EventEmitter implements IDriver {
     else if (isResponseMessage(message)) {
       const key = `${message.channel}-${message.id}`
       const task = this._waitForResponse.get(key)
-      !task && this._log.debug(`Skip message because task can not be found.`)
+      if (!task) {
+        this._log.warn(`Skip message because task can not be found.`)
+        return
+      }
 
       if (message.result) {
         this._log.debug(`Resolve task: ${key}`)
@@ -239,7 +235,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
       }
     }
     else {
-      this._log.debug(`Skip message because origin is invalid.`)
+      this._log.warn(`Skip message because origin is invalid.`)
     }
   }
 }
