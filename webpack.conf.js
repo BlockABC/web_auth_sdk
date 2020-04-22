@@ -19,7 +19,7 @@ module.exports = function (env = {}, argv) {
     target: 'web',
     resolve: {
       mainFields: ['browser', 'module', 'main'],
-      extensions: ['.ts', '.js', '.json']
+      extensions: ['.ts', '.js', '.json'],
     },
     output: {
       path: distDir,

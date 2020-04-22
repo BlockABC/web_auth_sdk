@@ -157,14 +157,14 @@ export class IFrameDriver extends EventEmitter implements IDriver {
       url.hostname = '127.0.0.1'
     }
 
-    return url.toString()
+    return url.toString().slice(0, -1)
   }
 
   /**
    * Clean up timeout tasks in a regular basis
    */
   protected _cleanTimeoutTask () {
-    this._log.debug(`Start cleaning timeout request`)
+    this._log.trace(`Start cleaning timeout request`)
     const now = new Date()
     for (let [key, val] of this._waitForResponse.entries()) {
       if (now.getTime() - val.createdAt.getTime() > this._timeout) {
@@ -185,19 +185,14 @@ export class IFrameDriver extends EventEmitter implements IDriver {
     this._log.info(`Received message from: ${e.origin}`)
     this._log.debug(`Message content:`, e.data)
 
-    // skip message from the same page, skip empty message
-    if (process.env.PROD && e.origin === window.location.origin) {
-      this._log.warn(`Skip message because origin is the same.`)
-      return
-    }
     // skip empty message
-    else if (!isMessage(e.data)) {
-      this._log.warn(`Skip message because it is empty.`)
+    if (!isMessage(e.data)) {
+      this._log.warn(`Skip message because its structure is invalid.`)
       return
     }
     // skip message from invalid page
     else if (this._targetOrigin !== this._cleanOrigin(e.origin)) {
-      this._log.warn(`Skip message because origin is invalid.`)
+      this._log.warn(`Skip message because its origin is invalid.`)
       return
     }
 
