@@ -34,6 +34,46 @@ describe('helper', () => {
     })
   })
 
+  describe('isNotifyMessage', () => {
+    test('should return true if it implement INotifyMessage', () => {
+      const message = {
+        channel: 'default',
+        method: 'test',
+        params: {
+          a: 1,
+          b: '2',
+        }
+      }
+      expect(helper.isNotifyMessage(message)).toBeTruthy()
+    })
+
+    test('should support nil params', () => {
+      const message = {
+        channel: 'default',
+        method: 'test',
+        params: null as any
+      }
+      expect(helper.isNotifyMessage(message)).toBeTruthy()
+    })
+
+    test('should return false if it implement IRequestMessage', () => {
+      const message = {
+        channel: 'default',
+        id: 'id',
+        method: 'test',
+      }
+      expect(helper.isNotifyMessage(message)).toBeFalsy()
+    })
+
+    test('should return false if it does not implement INotifyMessage', () => {
+      const message = {
+        channel: 'default',
+        method: 'test',
+      }
+      expect(helper.isNotifyMessage(message)).toBeFalsy()
+    })
+  })
+
   describe('isRequestMessage', () => {
     test('should return true if it implement IRequestMessage', () => {
       const message = {
@@ -65,37 +105,6 @@ describe('helper', () => {
         method: 'test',
       }
       expect(helper.isRequestMessage(message)).toBeFalsy()
-    })
-  })
-
-  describe('isNotifyMessage', () => {
-    test('should return true if it implement INotifyMessage', () => {
-      const message = {
-        channel: 'default',
-        method: 'test',
-        params: {
-          a: 1,
-          b: '2',
-        }
-      }
-      expect(helper.isNotifyMessage(message)).toBeTruthy()
-    })
-
-    test('should support nil params', () => {
-      const message = {
-        channel: 'default',
-        method: 'test',
-        params: null as any
-      }
-      expect(helper.isNotifyMessage(message)).toBeTruthy()
-    })
-
-    test('should return false if it does not implement INotifyMessage', () => {
-      const message = {
-        channel: 'default',
-        method: 'test',
-      }
-      expect(helper.isNotifyMessage(message)).toBeFalsy()
     })
   })
 

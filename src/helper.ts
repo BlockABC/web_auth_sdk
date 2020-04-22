@@ -17,7 +17,7 @@ export function isRequestMessage (val: any): val is IRequestMessage {
 }
 
 export function isNotifyMessage (val: any): val is INotifyMessage {
-  return !!(val.channel && val.method && val.hasOwnProperty('params'))
+  return !!(val.channel && val.method && val.hasOwnProperty('params') && !val.hasOwnProperty('id'))
 }
 
 export function isResponseMessage (val: any): val is IResponseMessage {
