@@ -32,7 +32,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
   }
 
   constructor (
-    { win, defaultChannel = 'default', targetOrigin, timeout = 30000 }:
+    { win, defaultChannel = 'default', targetOrigin, timeout = 60000 }:
     { win: Window, defaultChannel?: string, targetOrigin: string, timeout?: number }
   ) {
     super()
@@ -182,6 +182,11 @@ export class IFrameDriver extends EventEmitter implements IDriver {
    * @param {Event} e
    */
   protected _listen (e: MessageEvent): void {
+    // Skip message created by vue-devtools
+    if (e.data.source && typeof e.data.source === 'string' && e.data.source.startsWith('vue-devtools')) {
+      return
+    }
+
     this._log.info(`Received message from: ${e.origin}`)
     this._log.debug(`Message content:`, e.data)
 
