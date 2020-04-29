@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js'
+
 export interface IDriver {
   timeout: number,
 
@@ -79,4 +81,28 @@ export interface IError {
   code: number,
   data: any | null
   message: string,
+}
+
+export interface ISignInResult {
+  address:  string;
+  nickname: string;
+  profile:  any;
+}
+
+export interface ISignedTransactionResult {
+  signedTransaction: RPC.RawTransaction;
+}
+
+export interface IUTXOToParam {
+  address: string,
+  value: Decimal.Value,
+}
+
+export interface IUTXOUnspent {
+  txId: string,
+  address: string,
+  vout: number,
+  value: Decimal.Value,
+  lock?: any,
+  lockHash?: string,
 }

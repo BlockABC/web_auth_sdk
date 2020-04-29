@@ -32,7 +32,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
   }
 
   constructor (
-    { win, defaultChannel = 'default', targetOrigin, timeout = 60000 }:
+    { win, defaultChannel = 'default', targetOrigin, timeout = 300000 }:
     { win: Window, defaultChannel?: string, targetOrigin: string, timeout?: number }
   ) {
     super()
@@ -57,7 +57,7 @@ export class IFrameDriver extends EventEmitter implements IDriver {
 
     window.addEventListener('message', this._listen.bind(this))
 
-    this._cleanTimerId = setInterval(this._cleanTimeoutTask.bind(this), 3000)
+    this._cleanTimerId = setInterval(this._cleanTimeoutTask.bind(this), 5000)
   }
 
   notify (
