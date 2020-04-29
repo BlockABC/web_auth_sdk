@@ -9,18 +9,19 @@
   <link href="./static/bootstrap.min.css" rel="stylesheet">
   <script src="./static/vue.js"></script>
   <script src="./static/v-jsoneditor.min.js"></script>
+  <script src="./static/gsap.min.js"></script>
 
   <style>
     body {
-      padding: 0.5rem;
+      overflow-x: hidden;
     }
 
     h2 {
       margin: 0;
     }
 
-    .container-fluid>.row+.row {
-      margin-top: 1rem;
+    .form-group.row {
+      border-top: 1px solid #DDD;
     }
 
     .form-group .input-group+.input-group {
@@ -28,10 +29,6 @@
     }
 
     .form-group .input-group+.form-check {
-      margin-top: 1rem;
-    }
-
-    .form-group .btn.btn-primary {
       margin-top: 1rem;
     }
   </style>
