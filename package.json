@@ -43,10 +43,12 @@
   },
   "dependencies": {
     "consola": "^2.11.3",
+    "decimal.js": "^10.2.0",
     "eventemitter3": "^4.0.0",
     "ts-custom-error": "^3.1.1"
   },
   "devDependencies": {
+    "@nervosnetwork/ckb-sdk-rpc": "^0.31.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/exec": "^5.0.0",
     "@semantic-release/git": "^9.0.0",

@@ -2,7 +2,7 @@ import consola, { Consola } from 'consola'
 import EventEmitter from 'eventemitter3'
 
 import { IDriver, INotifyMessage, IRequestMessage, IResponseMessage, IRequestTask, IResponseTask } from '../interface'
-import { ParamError } from '../error'
+import { ParamError, WebAuthError } from '../error'
 import { isMessage, isNotifyMessage, isRequestMessage, isResponseMessage, isValidUrl, isWindow } from '../helper'
 
 export class IFrameDriver extends EventEmitter implements IDriver {
@@ -202,9 +202,8 @@ export class IFrameDriver extends EventEmitter implements IDriver {
     }
 
     const message = e.data
-    const event = `${message.channel}:${message.method}`
+    const event = `${message.channel}:*`
     if (isNotifyMessage(message)) {
-      this._log.debug(`Emit event: ${event}`)
       this.emit(event, message)
     }
     else if (isRequestMessage(message)) {
@@ -214,7 +213,6 @@ export class IFrameDriver extends EventEmitter implements IDriver {
         message,
       })
 
-      this._log.debug(`Emit event: ${event}`)
       this.emit(event, message)
     }
     else if (isResponseMessage(message)) {
@@ -229,9 +227,12 @@ export class IFrameDriver extends EventEmitter implements IDriver {
         this._log.debug(`Resolve task: ${key}`)
         task.resolve(message.result)
       }
-      else {
+      else if (message.error) {
         this._log.debug(`Reject task: ${key}`)
-        task.reject(message.error)
+        task.reject(new WebAuthError(message.error.code, message.error.message))
+      }
+      else {
+        this._log.error(`Skip message because no result and error.`)
       }
     }
     else {

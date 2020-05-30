@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 
 export interface IDriver {
-  timeout: number,
+  timeout: number
 
   /**
    * Send a notify message to target window
@@ -13,7 +13,7 @@ export interface IDriver {
   notify (
     { channel, method, params }:
     { channel?: string, method: string, params?: any }
-  ): void,
+  ): void
 
   /**
    * Send a request message to target window
@@ -28,7 +28,7 @@ export interface IDriver {
   request<T> (
     { channel, method, params }:
     { channel?: string, method: string, params?: any }
-  ): Promise<T>,
+  ): Promise<T>
 
   /**
    * Send a response message to target window
@@ -41,7 +41,7 @@ export interface IDriver {
   response (
     { channel, id, result, error }:
     { channel?: string, id: string, result?: any, error?: any }
-  ): void,
+  ): void
 }
 
 export interface IResponseTask {
@@ -72,25 +72,25 @@ export interface INotifyMessage {
 
 export interface IResponseMessage {
   channel: string,
-  error?: IError
+  error?: IError,
   id: string,
   result?: any,
 }
 
 export interface IError {
   code: number,
-  data: any | null
+  data: any | null,
   message: string,
 }
 
 export interface ISignInResult {
-  address:  string;
-  nickname: string;
-  profile:  any;
+  address:  string,
+  nickname: string,
+  profile:  any,
 }
 
 export interface ISignedTransactionResult {
-  signedTransaction: RPC.RawTransaction;
+  signedTransaction: RPC.RawTransaction,
 }
 
 export interface IUTXOToParam {

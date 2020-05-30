@@ -1,4 +1,5 @@
 import consola, { Consola } from 'consola'
+import EventEmitter from 'eventemitter3'
 
 import { ParamError } from './error'
 import { hasKey, isString } from './helper'
@@ -7,7 +8,7 @@ import { IDriver, ISignedTransactionResult, ISignInResult, IUTXOToParam, IUTXOUn
 import { LOG_LEVEL } from './constants'
 import { IFrameDriver } from './driver'
 
-export class WebAuth {
+export class WebAuth extends EventEmitter {
   protected _driver: IDriver
   protected _log: Consola
 
@@ -15,10 +16,12 @@ export class WebAuth {
     return this._driver
   }
 
-  constructor(
-    { driver, options, loglevel = 'info' }:
-    { driver: string, options: any, loglevel?: string | number }
+  constructor (
+    { driver = 'iframe', options, loglevel = 'info' }:
+    { driver?: string, options: any, loglevel?: string | number }
   ) {
+    super()
+
     if (hasKey(LOG_LEVEL, loglevel)) {
       consola.level = LOG_LEVEL[loglevel]
     }
@@ -39,10 +42,10 @@ export class WebAuth {
   /**
    * Send ping request
    *
-   * @returns {Promise<boolean>}
+   * @returns {Promise<string>}
    */
-  ping (): Promise<boolean> {
-    return this._driver.request<boolean>({ method: 'ping' })
+  ping (): Promise<string> {
+    return this._driver.request<string>({ method: 'ping' })
   }
 
   /**
@@ -61,7 +64,7 @@ export class WebAuth {
   /**
    * Send request for building transaction
    *
-   * @param tos
+   * @param {IUTXOToParam[]} tos
    * @returns {Promise<ISignedTransactionResult>}
    */
   buildTransaction ({ tos }: { tos: IUTXOToParam[] }): Promise<ISignedTransactionResult> {
@@ -72,14 +75,15 @@ export class WebAuth {
   }
 
   /**
+   * Send request for signing transaction
    *
-   * @param unspents
-   * @param rawTransaction
+   * @param {IUTXOUnspent[]} unspents
+   * @param {RPC.RawTransaction} rawTransaction
    * @returns {Promise<ISignedTransactionResult>}
    */
   signTransaction (
     { unspents, rawTransaction }:
-    { unspents: IUTXOUnspent, rawTransaction: RPC.RawTransaction }
+    { unspents: IUTXOUnspent[], rawTransaction: RPC.RawTransaction }
   ): Promise<ISignedTransactionResult> {
     return this._driver.request<any>({
       method: 'signTransaction',
@@ -87,7 +91,13 @@ export class WebAuth {
     })
   }
 
-  pushTransaction ({ rawTransaction }: { rawTransaction: any }): Promise<any> {
-    return this._driver.request<any>({ method: 'signTransaction', params: { rawTransaction } })
+  /**
+   * Push raw transaction
+   *
+   * @param {RPC.RawTransaction} rawTransaction
+   * @return {Promise<{ txId: string }>}
+   */
+  pushTransaction ({ rawTransaction }: { rawTransaction: RPC.RawTransaction }): Promise<{ txId: string }> {
+    return this._driver.request<any>({ method: 'pushTransaction', params: { rawTransaction } })
   }
 }
