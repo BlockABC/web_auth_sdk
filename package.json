@@ -1,6 +1,6 @@
 {
   "name": "web_auth_sdk",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The only and best SDK for ABCWallet application development.",
   "author": "Link <xie.al@qq.com>",
   "license": "MIT",
