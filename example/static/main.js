@@ -1,3 +1,7 @@
+const iframeWidth = 360
+// WARNING! This url must be where your web_auth_page serves.
+const iframeSrc = 'http://127.0.0.1:8081'
+
 const app = new Vue({
   el: '#app',
   template: `
@@ -36,7 +40,7 @@ const app = new Vue({
                   <label class="col-sm-2 col-form-label">Build Transaction</label>
                   <div class="col-sm-10">
                     <label class="mt-2">Params:</label>
-                    <v-jsoneditor v-model="buildTransactionParams"></v-jsoneditor>
+                    <v-jsoneditor cache="buildTransactionParams" v-model="buildTransactionParams"></v-jsoneditor>
                     <button class="btn btn-primary mt-2" @click.prevent="onBuildTransaction">Build</button>
                     <label class="mt-2 d-block">Signed Transaction:</label>
                     <v-jsoneditor v-model="buildTransactionResult"></v-jsoneditor>
@@ -47,12 +51,23 @@ const app = new Vue({
                   <label class="col-sm-2 col-form-label">Sign Transaction</label>
                   <div class="col-sm-10">
                     <label class="mt-2">Unspents:</label>
-                    <v-jsoneditor v-model="signTransactionParams.unspents"></v-jsoneditor>
+                    <v-jsoneditor cache="signTransactionParams.unspents" v-model="signTransactionParams.unspents"></v-jsoneditor>
                     <label class="mt-2">Raw Transaction:</label>
-                    <v-jsoneditor v-model="signTransactionParams.rawTransaction"></v-jsoneditor>
+                    <v-jsoneditor cache="signTransactionParams.rawTransaction" v-model="signTransactionParams.rawTransaction"></v-jsoneditor>
                     <button class="btn btn-primary mt-2" @click.prevent="onSignTransaction">Sign</button>
                     <label class="mt-2 d-block">Signed Transaction:</label>
                     <v-jsoneditor v-model="signTransactionResult"></v-jsoneditor>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Push Transaction</label>
+                  <div class="col-sm-10">
+                    <label class="mt-2">Raw Transaction:</label>
+                    <v-jsoneditor cache="pushTransactionParams.rawTransaction" v-model="pushTransactionParams.rawTransaction"></v-jsoneditor>
+                    <button class="btn btn-primary mt-2" @click.prevent="onPushTransaction">Push</button>
+                    <label class="mt-2 d-block">Pushed Transaction:</label>
+                    <a :href="'https://explorer.nervos.org/transaction/' + pushTransactionResult" target="_blank">{{ pushTransactionResult }}</a>
                   </div>
                 </div>
 
@@ -64,16 +79,17 @@ const app = new Vue({
 
       <iframe
         ref="iframe"
-        src="http://127.0.0.1:3000"
-        style="position: fixed; height: 600px; width: 360px;"
+        :src="iframeSrc"
+        style="position: fixed; height: 600px; width: 360px; border: none;"
         :style="animatedStyle"></iframe>
     </div>
   `,
   data () {
     return {
       iFrameShown: false,
+      iframeSrc,
       tweenedStyle: {
-        right: -360,
+        right: -iframeWidth,
         top: 0,
       },
       user: {
@@ -92,6 +108,10 @@ const app = new Vue({
         rawTransaction: {"version":"0x0","cell_deps":[{"out_point":{"tx_hash":"0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c","index":"0x0"},"dep_type":"dep_group"}],"inputs":[{"previous_output":{"tx_hash":"0xd86b1bd1799ca6a94eeac991bbb73e52dbf0acf008fc544d0467f3260040f388","index":"0x0"},"since":"0x0"},{"previous_output":{"tx_hash":"0xd86b1bd1799ca6a94eeac991bbb73e52dbf0acf008fc544d0467f3260040f388","index":"0x1"},"since":"0x0"}],"outputs":[{"capacity":"0x16b969d00","lock":{"code_hash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8","hash_type":"type","args":"0xff29ef9d5e3184ba85d399f122e20adff3a743b2"},"type":null},{"capacity":"0x33c812061","lock":{"code_hash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8","hash_type":"type","args":"0xff29ef9d5e3184ba85d399f122e20adff3a743b2"},"type":null}],"outputs_data":["0x","0x"],"header_deps":[],"witnesses":[{"lock":"","inputType":"","outputType":""},{"lock":"","inputType":"","outputType":""}]},
       },
       signTransactionResult: {},
+      pushTransactionParams: {
+        rawTransaction: {}
+      },
+      pushTransactionResult: '0x456a6abfb2b2f5291e31cf001222766fb5c98cf65a0a8aecbad0660656bb087d'
     }
   },
   computed: {
@@ -108,7 +128,7 @@ const app = new Vue({
       loglevel: 'debug',
       options: {
         win: this.$refs.iframe.contentWindow,
-        targetOrigin: 'http://127.0.0.1:3000',
+        targetOrigin: iframeSrc,
       }
     })
   },
@@ -125,7 +145,7 @@ const app = new Vue({
     hideIFrame () {
       gsap.to(this.tweenedStyle, {
         duration: 0.5,
-        right: -300,
+        right: -iframeWidth,
         onComplete: () => {
           this.iFrameShown = false
         }
@@ -160,6 +180,7 @@ const app = new Vue({
         this.buildTransactionResult = signedTransaction
       }
       catch (err) {
+        debugger
         alert(err.message)
       }
 
@@ -176,10 +197,23 @@ const app = new Vue({
         this.signTransactionResult = signedTransaction
       }
       catch (err) {
+        debugger
         alert(err.message)
       }
 
       this.hideIFrame()
+    },
+    async onPushTransaction () {
+      try {
+        const { txId } = await this.$options.webauth.pushTransaction({
+          rawTransaction: this.pushTransactionParams.rawTransaction,
+        })
+        this.pushTransactionResult = txId
+      }
+      catch (err) {
+        debugger
+        alert(err.message)
+      }
     }
   }
 })
