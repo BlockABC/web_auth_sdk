@@ -21,6 +21,7 @@ npm install @blockabc/web_auth_sdk
 ### 示例
 
 源码位于 [example/static/main.js](./example/static/main.js) ，`clone` 本项目，安装相关依赖，然后执行 `npm run dev` 即可看到示例用的 Dapp 。
+如果需要自定义 HOST、PORT 等环境变量，可以新建一个 `.env` 文件，其中的环境变量配置会覆盖 `.development.env` 中的环境变量配置。
 需要注意的是**你必须根据你的 [Web Auth Page] 所在 URL 配置 [example/static/main.js](./example/static/main.js) 顶部的 `iframeSrc` 变量**。
 
 #### 初始化

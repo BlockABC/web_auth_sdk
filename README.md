@@ -21,6 +21,7 @@ npm install @blockabc/web_auth_sdk
 ### Example
 
 The source code is located at [example/static/main.js](. /example/static/main.js), `clone` this project, install the dependencies, and then run `npm run dev` to see the demo Dapp.
+If you need to customize the environment variables such as HOST, PORT, etc., you can create a new `.env` file which will override the environment variables in `.development.env`.
 Note that **you must configure the `iframeSrc` constant at the top of [example/static/main.js](./example/static/main.js) base on the URL of your [Web Auth Page] server.
 
 #### Initialization
