@@ -1,7 +1,30 @@
+const dotenv = require('dotenv')
+const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+// Load dotenv files for environments
+let environments = {}
+for (const envFile of ['.development.env', '.env']) {
+  try {
+    environments = Object.assign(environments, dotenv.parse(fs.readFileSync(path.resolve(process.cwd(), envFile))))
+  }
+  catch (err) {
+    if (envFile === '.env' && err.code === 'ENOENT') {
+      continue
+    }
+    throw err
+  }
+}
+
+// If process.env[key] is already exists, never replace it.
+Object.keys(environments).forEach(function (key) {
+  if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
+    process.env[key] = environments[key]
+  }
+})
 
 const libName = 'webauth'
 const srcDir = path.resolve(__dirname, 'src')
@@ -75,7 +98,8 @@ module.exports = function (env = {}, argv) {
   else {
     // config.watch = true
     config.devServer = {
-      host: '0.0.0.0',
+      host: process.env.HOST,
+      port: process.env.PORT,
       disableHostCheck: true,
       serveIndex: true,
       publicPath: '/static/',
